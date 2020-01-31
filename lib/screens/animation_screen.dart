@@ -1,61 +1,43 @@
 import 'package:flutter/material.dart';
 
+const String imageConst =
+    "https://images.pexels.com/photos/1295138/pexels-photo-1295138.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260";
+
 class AnimationScreen extends StatefulWidget {
   @override
   _AnimationScreenState createState() => _AnimationScreenState();
 }
 
-class _AnimationScreenState extends State<AnimationScreen>
-    with SingleTickerProviderStateMixin {
-  AnimationController rectangleRotation;
-
-  double rotation = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    rectangleRotation = AnimationController(
-      vsync: this,
-      duration: Duration(seconds: 3),
-    );
-    rectangleRotation.forward();
-    rectangleRotation.addListener(() {
-      setState(() {
-        rotation = rectangleRotation.value;
-      });
-    });
-  }
+class _AnimationScreenState extends State<AnimationScreen> {
+  var decorationImage = DecorationImage(
+    image: NetworkImage(imageConst),
+    fit: BoxFit.cover,
+  );
 
   @override
   Widget build(BuildContext context) {
+    ;
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          image: DecorationImage(
-              image: NetworkImage(
-                  "https://images.pexels.com/photos/1295138/pexels-photo-1295138.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"),
-              fit: BoxFit.cover),
+          image: decorationImage,
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.only(top: 15),
+            padding: const EdgeInsets.only(top: 10),
             child: Card(
               color: Colors.white.withOpacity(0.7),
               child: Center(
                 child: GestureDetector(
-                  onTap: () {
-                    rectangleRotation.status == AnimationStatus.completed
-                        ? rectangleRotation.reverse()
-                        : rectangleRotation.forward();
-                  },
                   child: Container(
-                    transform: Matrix4.identity()
-                      ..rotateX(rotation * 3)
-                      ..rotateY(rotation * 6)
-                      ..rotateZ(rotation * 9),
-                    height: 100,
-                    width: 100,
-                    color: Colors.black,
+                    height: 250,
+                    width: 250,
+                    color: Colors.black.withOpacity(0.8),
+                    child: Icon(
+                      Icons.wb_sunny,
+                      size: 124.0,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),

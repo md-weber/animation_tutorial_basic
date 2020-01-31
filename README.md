@@ -1,6 +1,6 @@
 # animation_tutorial_basic
 
-A basic loading spinner tutorial to explain how to use the animation controller.
+Basic example of a rotating animation in Dart!
 
 ## Getting Started
 
