@@ -8,7 +8,33 @@ class AnimationScreen extends StatefulWidget {
   _AnimationScreenState createState() => _AnimationScreenState();
 }
 
-class _AnimationScreenState extends State<AnimationScreen> {
+class _AnimationScreenState extends State<AnimationScreen>
+    with SingleTickerProviderStateMixin {
+  AnimationController animationController;
+
+  double rotationAngle = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 1),
+    );
+
+    animationController.forward();
+
+    animationController.addStatusListener((status) {
+      print(status);
+    });
+
+    animationController.addListener(() {
+      setState(() {
+        rotationAngle = animationController.value * 3;
+      });
+    });
+  }
+
   var decorationImage = DecorationImage(
     image: NetworkImage(imageConst),
     fit: BoxFit.cover,
@@ -27,16 +53,20 @@ class _AnimationScreenState extends State<AnimationScreen> {
             padding: const EdgeInsets.only(top: 10),
             child: Card(
               color: Colors.white.withOpacity(0.7),
+              elevation: 2.0,
               child: Center(
                 child: GestureDetector(
                   child: Container(
                     height: 250,
                     width: 250,
                     color: Colors.black.withOpacity(0.8),
-                    child: Icon(
-                      Icons.wb_sunny,
-                      size: 124.0,
-                      color: Colors.white,
+                    child: Transform.rotate(
+                      angle: rotationAngle,
+                      child: Icon(
+                        Icons.wb_sunny,
+                        size: 124.0,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
