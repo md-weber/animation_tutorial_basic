@@ -1,80 +1,200 @@
 import 'package:flutter/material.dart';
+import 'package:random_color/random_color.dart';
 
-const String imageConst =
-    "https://images.pexels.com/photos/1295138/pexels-photo-1295138.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260";
+class AnimationScreen extends StatelessWidget {
+  final int armySize = 10000;
 
-class AnimationScreen extends StatefulWidget {
   @override
-  _AnimationScreenState createState() => _AnimationScreenState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("ArmySize: $armySize AnimationArmy!"),
+      ),
+      body: Container(
+        child: ListView(
+          children: createArmySize(),
+        ),
+      ),
+    );
+  }
+
+  List<Row> createArmySize() {
+    List<Row> army = List();
+    for (int i = 0; i < armySize; i++) {
+      army.add(Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          CustomLoadingSpinner(
+            bodyColor: RandomColor().randomColor(),
+          ),
+          CustomLoadingSpinner(
+            bodyColor: RandomColor().randomColor(),
+          ),
+          CustomLoadingSpinner(
+            bodyColor: RandomColor().randomColor(),
+          )
+        ],
+      ));
+    }
+    return army;
+  }
 }
 
-class _AnimationScreenState extends State<AnimationScreen>
-    with SingleTickerProviderStateMixin {
-  AnimationController animationController;
+class CustomLoadingSpinner extends StatefulWidget {
+  final Color bodyColor;
 
-  double rotationAngle = 0;
+  const CustomLoadingSpinner({Key key, this.bodyColor}) : super(key: key);
+
+  @override
+  _CustomLoadingSpinnerState createState() => _CustomLoadingSpinnerState();
+}
+
+class _CustomLoadingSpinnerState extends State<CustomLoadingSpinner>
+    with TickerProviderStateMixin {
+  AnimationController firstDotAnimationController;
+
+  AnimationController secondDotAnimationController;
+
+  AnimationController thirdDotAnimationController;
+
+  @override
+  void dispose() {
+    firstDotAnimationController.dispose();
+    secondDotAnimationController.dispose();
+    thirdDotAnimationController.dispose();
+    super.dispose();
+  }
+
+  Tween<Offset> firstTween = Tween<Offset>(
+    begin: Offset(0, 0),
+    end: Offset(0, -30),
+  );
+
+  Tween<Offset> secondTween = Tween<Offset>(
+    begin: Offset(0, 0),
+    end: Offset(0, -10),
+  );
+
+  Tween<Offset> thirdTween = Tween<Offset>(
+    begin: Offset(0, 0),
+    end: Offset(0, -15),
+  );
+  var mainAxisAlignment = MainAxisAlignment.start;
+  int counter = 0;
 
   @override
   void initState() {
     super.initState();
-    animationController = AnimationController(
+    firstDotAnimationController = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 1),
+      duration: Duration(milliseconds: 300),
     );
 
-    animationController.forward();
+    secondDotAnimationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+    );
 
-    animationController.addStatusListener((status) {
-      print(status);
+    thirdDotAnimationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+    );
+
+    firstDotAnimationController.repeat(reverse: true);
+
+    Future.delayed(Duration(milliseconds: 200)).then((value) {
+      secondDotAnimationController.repeat(reverse: true);
+      Future.delayed(Duration(milliseconds: 100)).then((value) {
+        thirdDotAnimationController.repeat(reverse: true);
+      });
     });
 
-    animationController.addListener(() {
-      setState(() {
-        rotationAngle = animationController.value * 3;
-      });
+    firstDotAnimationController.addStatusListener((status) {
+      counter++;
+      if (counter % 10 == 0) {
+        setState(() {
+          mainAxisAlignment = mainAxisAlignment == MainAxisAlignment.start
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.start;
+        });
+      }
+    });
+
+    firstDotAnimationController.addListener(() {
+      setState(() {});
     });
   }
 
-  var decorationImage = DecorationImage(
-    image: NetworkImage(imageConst),
-    fit: BoxFit.cover,
-  );
-
   @override
   Widget build(BuildContext context) {
-    ;
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: decorationImage,
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Card(
-              color: Colors.white.withOpacity(0.7),
-              elevation: 2.0,
-              child: Center(
-                child: GestureDetector(
-                  child: Container(
-                    height: 250,
-                    width: 250,
-                    color: Colors.black.withOpacity(0.8),
-                    child: Transform.rotate(
-                      angle: rotationAngle,
-                      child: Icon(
-                        Icons.wb_sunny,
-                        size: 124.0,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Transform.translate(
+          offset: firstTween.animate(firstDotAnimationController).value,
+          child: Container(
+            height: 20,
+            width: 20,
+            margin: EdgeInsets.all(2.0),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: widget.bodyColor,
             ),
           ),
         ),
-      ),
+        Transform.translate(
+          offset: secondTween.animate(secondDotAnimationController).value,
+          child: Container(
+            height: 80,
+            width: 80,
+            margin: EdgeInsets.all(2.0),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: widget.bodyColor,
+            ),
+            child: Row(
+              mainAxisAlignment: mainAxisAlignment,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    height: 10,
+                    width: 10,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    height: 5,
+                    width: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+        Transform.translate(
+          offset: thirdTween.animate(thirdDotAnimationController).value,
+          child: Container(
+            height: 20,
+            width: 20,
+            margin: EdgeInsets.all(2.0),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: widget.bodyColor,
+            ),
+          ),
+        )
+      ],
     );
   }
 }
